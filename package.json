@@ -1,0 +1,9 @@
+{
+  "name": "oursynth-eco",
+  "private": true,
+  "version": "1.0.0",
+  "packageManager": "pnpm@10.14.0",
+  "devDependencies": {
+    "@types/react": "^19.1.10"
+  }
+}

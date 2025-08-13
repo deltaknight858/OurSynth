@@ -1,0 +1,69 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "bootstrap",
+      "dependsOn": [
+        "install:deps",
+        "approve:build-scripts",
+        "build:repo",
+        "dev:apps",
+        "dev:infra",
+        "open:studio"
+      ],
+      "dependsOrder": "sequence"
+    },
+
+    {
+      "label": "install:deps",
+      "type": "shell",
+      "command": "pnpm install",
+      "problemMatcher": []
+    },
+
+    {
+      "label": "approve:build-scripts",
+      "type": "shell",
+      "command": "pnpm approve-builds",
+      "problemMatcher": []
+    },
+
+    {
+      "label": "build:repo",
+      "type": "shell",
+      "command": "pnpm -r --if-present build",
+      "problemMatcher": []
+    },
+
+    {
+      "label": "dev:apps",
+      "type": "shell",
+      "command": "pnpm -r --filter \"./apps/*\" --if-present run dev",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+
+    {
+      "label": "dev:infra",
+      "type": "shell",
+      "command": "pnpm -r --filter \"./infra/*\" --if-present run dev",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+
+    {
+      "label": "dev:packages:ui",
+      "type": "shell",
+      "command": "pnpm -r --filter \"./packages/*\" --if-present run dev",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+
+    {
+      "label": "open:studio",
+      "type": "command",
+      "command": "simpleBrowser.show",
+      "args": ["http://localhost:3000"]
+    }
+  ]
+}

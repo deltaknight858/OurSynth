@@ -1,0 +1,937 @@
+Path: apps/web/components/store/GenerateWithPathways.tsx
+
+tsx
+'use client';
+
+import { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { startWizard } from '@oursynth/integrations/pathways-client';
+import { useSupabaseUser } from '@/lib/auth/useSupabaseUser';
+
+type Props = {
+  product: {
+    slug: string;
+    title: string;
+    version: string;
+    isPremium: boolean;
+    templateMeta?: {
+      route?: string;
+      options?: Record<string, any>;
+    };
+  };
+  isEntitled: boolean;
+};
+
+export default function GenerateWithPathways({ product, isEntitled }: Props) {
+  const { user } = useSupabaseUser();
+  const [open, setOpen] = useState(false);
+  const [isRunning, setIsRunning] = useState(false);
+
+  async function handleGenerate() {
+    if (!user || !product.templateMeta) return;
+    setIsRunning(true);
+    try {
+      await startWizard({
+        productSlug: product.slug,
+        version: product.version ?? 'latest',
+        wizardConfig: {
+          targetApp: 'web',
+          route: product.templateMeta.route ?? `/store/${product.slug}`,
+          ...(product.templateMeta.options ?? {}),
+        },
+      });
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsRunning(false);
+      setOpen(false);
+    }
+  }
+
+  if (!user) return null;
+
+  return (
+    <>
+      <button
+        className={`mt-2 px-4 py-2 rounded-lg font-semibold transition shadow-[0_0_10px_rgba(34,211,238,0.35)] ${
+          isEntitled
+            ? 'bg-cyan-400 text-black hover:brightness-110'
+            : 'bg-neutral-800 text-cyan-300 hover:bg-neutral-700'
+        }`}
+        onClick={() => {
+          if (isEntitled) setOpen(true);
+          else window.location.href = `/cart?product=${product.slug}`;
+        }}
+      >
+        {isEntitled ? 'Generate with Pathways' : 'Buy to Generate'}
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+            onClick={() => setOpen(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.2 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-lg rounded-2xl border border-cyan-400/30 bg-[rgba(20,20,30,0.9)] p-6 backdrop-blur-xl text-white"
+            >
+              <h3 className="text-xl font-semibold text-cyan-300 mb-2">
+                Generate {product.title}
+              </h3>
+              <p className="text-sm text-gray-300">
+                This will scaffold files into your monorepo. You can preview diffs and apply via PR.
+              </p>
+              <button
+                onClick={handleGenerate}
+                disabled={isRunning}
+                className="mt-4 px-4 py-2 rounded-lg bg-cyan-400 text-black font-semibold hover:brightness-110 transition disabled:opacity-60"
+              >
+                {isRunning ? 'Generating…' : 'Run Wizard'}
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+Path: apps/web/components/wizard/WizardStream.tsx
+
+tsx
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+
+type StreamData = {
+  phase: string;
+  fileCount: number;
+  elapsed: number;
+  errors?: string[];
+};
+
+type Props = { runId: string };
+
+export default function WizardStream({ runId }: Props) {
+  const [status, setStatus] = useState<StreamData | null>(null);
+  const [done, setDone] = useState(false);
+  const liveRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const evt = new EventSource(`/api/pathways/status?runId=${runId}`);
+    evt.onmessage = (e) => {
+      const data: StreamData = JSON.parse(e.data);
+      setStatus(data);
+      if (data.phase === 'done' || data.errors) {
+        setDone(true);
+        evt.close();
+      }
+    };
+    evt.onerror = () => evt.close();
+    return () => evt.close();
+  }, [runId]);
+
+  const phases: Record<string, string> = {
+    analyze: 'Analyzing inputs',
+    generate: 'Generating files',
+    lint: 'Linting & formatting',
+    diff: 'Preparing diff',
+    done: 'Ready!',
+    error: 'Error',
+  };
+
+  return (
+    <div className="rounded-2xl border border-cyan-400/30 bg-[rgba(20,20,30,0.85)] p-4 text-white backdrop-blur-xl">
+      <h4 className="text-cyan-300 font-semibold mb-2">Generating with Pathways</h4>
+
+      <AnimatePresence>
+        {status && (
+          <motion.div
+            key={status.phase}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="text-sm mb-2">
+              Phase: <span className="text-cyan-200">{phases[status.phase] ?? status.phase}</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs">
+              <span className="px-2 py-1 rounded bg-cyan-400/10 border border-cyan-400/30">
+                {status.fileCount} files
+              </span>
+              <span className="px-2 py-1 rounded bg-cyan-400/10 border border-cyan-400/30">
+                {status.elapsed}s elapsed
+              </span>
+              {status.errors?.length ? (
+                <span className="px-2 py-1 rounded bg-red-400/10 border border-red-400/40 text-red-300">
+                  Error
+                </span>
+              ) : null}
+            </div>
+            <div className="mt-3 h-1 w-full rounded bg-neutral-700 overflow-hidden">
+              <div
+                className={`h-1 transition-all ${
+                  done ? 'w-full bg-cyan-400' : 'w-1/3 animate-pulse bg-cyan-500'
+                }`}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div
+        ref={liveRef}
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {status?.phase}
+      </div>
+    </div>
+  );
+}
+Path: apps/web/components/wizard/PromptForm.tsx
+
+tsx
+'use client';
+
+import { useState } from 'react';
+import WizardStream from './WizardStream';
+
+type Props = {
+  defaultProductSlug?: string;
+  defaultType?: 'component' | 'page' | 'feature' | 'app';
+};
+
+export default function PromptForm({ defaultProductSlug = '', defaultType = 'component' }: Props) {
+  const [name, setName] = useState(defaultProductSlug);
+  const [goal, setGoal] = useState('');
+  const [type, setType] = useState<Props['defaultType']>(defaultType);
+  const [runId, setRunId] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true); setErr(null);
+    try {
+      const r = await fetch('/api/pathways/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productSlug: name,
+          version: 'latest',
+          wizardConfig: { targetApp: 'web', goal, type }
+        })
+      });
+      const json = await r.json();
+      if (!r.ok) throw new Error(json.error || 'Failed');
+      setRunId(json.runId);
+    } catch (e: any) {
+      setErr(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="rounded-2xl border border-cyan-400/30 bg-[rgba(20,20,30,0.85)] p-4 text-white backdrop-blur-xl">
+      <form onSubmit={onSubmit} className="space-y-3">
+        <div>
+          <label className="block text-sm text-cyan-200 mb-1">Template or slug</label>
+          <input
+            className="w-full rounded-lg bg-black/30 border border-cyan-400/30 px-3 py-2 outline-none focus:border-cyan-300"
+            value={name} onChange={(e)=>setName(e.target.value)} placeholder="login-page" required
+          />
+        </div>
+        <div>
+          <label className="block text-sm text-cyan-200 mb-1">Goal / description</label>
+          <textarea
+            className="w-full rounded-lg bg-black/30 border border-cyan-400/30 px-3 py-2 outline-none focus:border-cyan-300"
+            value={goal} onChange={(e)=>setGoal(e.target.value)} rows={3} placeholder="Add a responsive login page with OAuth"
+          />
+        </div>
+        <div>
+          <label className="block text-sm text-cyan-200 mb-1">Type</label>
+          <select
+            className="w-full rounded-lg bg-black/30 border border-cyan-400/30 px-3 py-2 outline-none focus:border-cyan-300"
+            value={type} onChange={(e)=>setType(e.target.value as any)}
+          >
+            <option value="component">Component</option>
+            <option value="page">Page</option>
+            <option value="feature">Feature</option>
+            <option value="app">App</option>
+          </select>
+        </div>
+        <button
+          type="submit"
+          disabled={busy}
+          className="px-4 py-2 rounded-lg bg-cyan-400 text-black font-semibold hover:brightness-110 transition disabled:opacity-60"
+        >
+          {busy ? 'Starting…' : 'Start generation'}
+        </button>
+        {err && <p className="text-red-300 text-sm">{err}</p>}
+      </form>
+
+      {runId && (
+        <div className="mt-4">
+          <WizardStream runId={runId} />
+        </div>
+      )}
+    </div>
+  );
+}
+Path: apps/web/components/wizard/DiffViewer.tsx
+
+tsx
+'use client';
+
+import { useEffect, useState } from 'react';
+
+type FileDiff = { path: string; status: 'add'|'modify'|'conflict'; };
+type DiffResponse = { files: FileDiff[]; diff: string };
+
+type Props = { runId: string };
+
+export default function DiffViewer({ runId }: Props) {
+  const [data, setData] = useState<DiffResponse | null>(null);
+  const [active, setActive] = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const r = await fetch(`/api/pathways/diff?runId=${encodeURIComponent(runId)}`);
+        const json = await r.json();
+        if (!r.ok) throw new Error(json.error || 'Failed to fetch diff');
+        setData(json);
+      } catch (e: any) { setErr(e.message); }
+    })();
+  }, [runId]);
+
+  useEffect(() => {
+    if (data && data.files.length && !active) setActive(data.files[0].path);
+  }, [data, active]);
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="rounded-2xl border border-cyan-400/30 bg-[rgba(20,20,30,0.85)] p-3 backdrop-blur-xl text-white">
+        <h4 className="text-cyan-300 font-semibold mb-2">Files</h4>
+        <ul className="space-y-1 max-h-80 overflow-auto text-sm">
+          {data?.files.map(f => (
+            <li key={f.path}>
+              <button
+                onClick={()=>setActive(f.path)}
+                className={`w-full text-left px-2 py-1 rounded ${
+                  active===f.path ? 'bg-cyan-400/20 border border-cyan-400/40' : 'hover:bg-white/5'
+                }`}
+              >
+                <span className="text-gray-300">{f.path}</span>
+                <span className={`ml-2 text-xs ${
+                  f.status === 'add' ? 'text-emerald-300' :
+                  f.status === 'modify' ? 'text-cyan-300' : 'text-amber-300'
+                }`}>[{f.status}]</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className="md:col-span-2 rounded-2xl border border-cyan-400/30 bg-[rgba(10,12,20,0.85)] p-3 backdrop-blur-xl text-white">
+        <h4 className="text-cyan-300 font-semibold mb-2">Diff</h4>
+        {err && <p className="text-red-300 text-sm">{err}</p>}
+        <pre className="text-xs leading-5 max-h-[32rem] overflow-auto whitespace-pre-wrap">
+{data?.diff}
+        </pre>
+      </div>
+    </div>
+  );
+}
+Path: packages/oai/package.json
+
+json
+{
+  "name": "@oursynth/oai",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.0",
+    "typescript": "^5.5.4"
+  }
+}
+Path: packages/oai/tsconfig.json
+
+json
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "moduleResolution": "Bundler",
+    "target": "ES2022",
+    "module": "ES2022",
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "include": ["src"]
+}
+Path: packages/oai/src/types.ts
+
+ts
+import { z } from 'zod';
+
+export type DomainStatus = 'pending' | 'verified' | 'active' | 'failed';
+export type EventEnvelope = {
+  id: string;
+  ts: number;
+  source: 'oai' | 'pathways' | 'deploy' | 'domains' | 'calm';
+  type: string;
+  data: Record<string, unknown>;
+};
+export type ToolResult = { ok: true; data?: unknown } | { ok: false; error: string };
+export type Tool = {
+  name: string;
+  description: string;
+  input: z.ZodTypeAny;
+  run: (params: any, emit: (evt: EventEnvelope) => void) => Promise<ToolResult>;
+};
+Path: packages/oai/src/bus.ts
+
+ts
+import { Server } from 'socket.io';
+import type { Server as HttpServer } from 'http';
+import { randomUUID } from 'crypto';
+import type { EventEnvelope } from './types';
+
+let io: Server | null = null;
+
+export function attachBus(server: HttpServer) {
+  io = new Server(server, {
+    cors: { origin: process.env.OAI_CORS_ORIGIN?.split(',') ?? ['*'] }
+  });
+  io.on('connection', (socket) => {
+    socket.emit('oai:hello', { ok: true, ts: Date.now() });
+  });
+}
+
+export function publish(source: EventEnvelope['source'], type: string, data: Record<string, unknown>) {
+  if (!io) return;
+  const evt: EventEnvelope = {
+    id: randomUUID(),
+    ts: Date.now(),
+    source,
+    type,
+    data
+  };
+  io.emit('oai:event', evt);
+}
+Path: packages/oai/src/tools.ts
+
+ts
+import { z } from 'zod';
+import type { Tool, ToolResult } from './types';
+import { publish } from './bus';
+
+const PATHWAYS_URL = process.env.PATHWAYS_URL!;
+const DEPLOY_URL = process.env.DEPLOY_URL!;
+const DOMAINS_URL = process.env.DOMAINS_URL!;
+const CALM_URL = process.env.CALM_URL!;
+
+async function http<T>(url: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(url, {
+    headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) },
+    ...init
+  });
+  if (!res.ok) throw new Error(`${res.status} ${res.statusText}: ${await res.text()}`);
+  return res.json() as Promise<T>;
+}
+
+export const tools: Tool[] = [
+  {
+    name: 'pathways.generate',
+    description: 'Run Pathways to generate/update code',
+    input: z.object({
+      productSlug: z.string(),
+      version: z.string().default('latest'),
+      wizardConfig: z.record(z.any()).default({})
+    }),
+    async run(params, emit): Promise<ToolResult> {
+      publish('pathways', 'run.started', params);
+      emit({ id: crypto.randomUUID(), ts: Date.now(), source: 'pathways', type: 'run.started', data: params });
+      try {
+        const data = await http<{ runId: string }>(`${PATHWAYS_URL}/api/pathways/start`, {
+          method: 'POST', body: JSON.stringify(params)
+        });
+        publish('pathways', 'run.accepted', { runId: data.runId });
+        return { ok: true, data };
+      } catch (e: any) {
+        publish('pathways', 'run.failed', { error: e.message });
+        return { ok: false, error: e.message };
+      }
+    }
+  },
+  {
+    name: 'deploy.create',
+    description: 'Create a deploy run',
+    input: z.object({
+      productSlug: z.string(),
+      version: z.string().default('latest'),
+      env: z.enum(['dev','staging','prod']).default('staging'),
+      runId: z.string().optional()
+    }),
+    async run(params): Promise<ToolResult> {
+      publish('deploy', 'run.started', params);
+      try {
+        const data = await http<{ deployId: string }>(`${DEPLOY_URL}/api/deploy/create`, {
+          method: 'POST', body: JSON.stringify(params)
+        });
+        publish('deploy', 'run.accepted', { deployId: data.deployId });
+        return { ok: true, data };
+      } catch (e: any) {
+        publish('deploy', 'run.failed', { error: e.message });
+        return { ok: false, error: e.message };
+      }
+    }
+  },
+  {
+    name: 'domains.map',
+    description: 'Map a custom domain',
+    input: z.object({ appId: z.string(), domain: z.string() }),
+    async run(params): Promise<ToolResult> {
+      publish('domains', 'map.started', params);
+      try {
+        const data = await http(`${DOMAINS_URL}/api/domains`, {
+          method: 'POST', body: JSON.stringify(params)
+        });
+        publish('domains', 'map.accepted', { id: (data as any).id, domain: params.domain });
+        return { ok: true, data };
+      } catch (e: any) {
+        publish('domains', 'map.failed', { error: e.message });
+        return { ok: false, error: e.message };
+      }
+    }
+  },
+  {
+    name: 'calm.edit',
+    description: 'Ask Calm to edit files and open a PR',
+    input: z.object({
+      task: z.string(),
+      files: z.array(z.string()).optional(),
+      branch: z.string().default('feature/oai-calm'),
+      repoPath: z.string().optional()
+    }),
+    async run(params): Promise<ToolResult> {
+      publish('calm', 'edit.started', params);
+      try {
+        const data = await http(`${CALM_URL}`, {
+          method: 'POST', body: JSON.stringify(params)
+        });
+        publish('calm', 'edit.completed', { prUrl: (data as any).prUrl });
+        return { ok: true, data };
+      } catch (e: any) {
+        publish('calm', 'edit.failed', { error: e.message });
+        return { ok: false, error: e.message };
+      }
+    }
+  }
+];
+Path: packages/oai/src/index.ts
+
+ts
+#!/usr/bin/env node
+import express from 'express';
+import { createServer } from 'http';
+import { json } from 'body-parser';
+import { z } from 'zod';
+import { attachBus, publish } from './bus';
+import { tools } from './tools';
+
+const app = express();
+app.use(json());
+
+const server = createServer(app);
+attachBus(server);
+
+const ToolCall = z.object({ action: z.string(), params: z.record(z.any()).default({}) });
+
+app.get('/oai/health', (_req, res) => res.json({ ok: true, ts: Date.now() }));
+app.get('/oai/tools', (_req, res) => res.json(tools.map(t => ({ name: t.name, description: t.description }))));
+
+app.post('/oai/act', async (req, res) => {
+  const parse = ToolCall.safeParse(req.body);
+  if (!parse.success) return res.status(400).json({ ok: false, error: 'Invalid payload' });
+  const { action, params } = parse.data;
+  const tool = tools.find(t => t.name === action);
+  if (!tool) return res.status(404).json({ ok: false, error: 'Unknown action' });
+  try {
+    const input = tool.input.parse(params);
+    publish('oai', 'action.received', { action });
+    const result = await tool.run(input, (evt) => publish(evt.source, evt.type, evt.data));
+    res.status(result.ok ? 200 : 400).json(result);
+  } catch (e: any) {
+    res.status(400).json({ ok: false, error: e.message });
+  }
+});
+
+const port = Number(process.env.OAI_PORT ?? 4311);
+server.listen(port, () => {
+  // eslint-disable-next-line no-console
+  console.log(`OAI orchestrator ready on http://localhost:${port}`);
+});
+Path: apps/studio/lib/useOAIEvents.ts
+
+ts
+'use client';
+import { useEffect, useState } from 'react';
+import { io, Socket } from 'socket.io-client';
+
+type OAIEvent = {
+  id: string;
+  ts: number;
+  source: 'oai'|'pathways'|'deploy'|'domains'|'calm';
+  type: string;
+  data: Record<string, unknown>;
+};
+
+export function useOAIEvents() {
+  const [events, setEvents] = useState<OAIEvent[]>([]);
+  useEffect(() => {
+    const s: Socket = io(process.env.NEXT_PUBLIC_OAI_WS ?? 'http://localhost:4311', { path: '/socket.io' });
+    s.on('oai:event', (evt: OAIEvent) => setEvents(prev => [...prev, evt]));
+    s.on('connect', () => setEvents(prev => [...prev, { id: 'hello', ts: Date.now(), source: 'oai', type: 'connected', data: {} }]));
+    return () => s.disconnect();
+  }, []);
+  return events;
+}
+Path: apps/studio/components/ChatPanel.tsx
+
+tsx
+'use client';
+
+import { useState } from 'react';
+import { useOAIEvents } from '../lib/useOAIEvents';
+
+export default function ChatPanel() {
+  const events = useOAIEvents();
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  async function oneClickShip(productSlug: string) {
+    setBusy(true); setErr(null);
+    try {
+      const gen = await fetch('http://localhost:4311/oai/act', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'pathways.generate', params: { productSlug, version: 'latest', wizardConfig: { targetApp: 'web' } } })
+      }).then(r => r.json());
+      if (!gen.ok) throw new Error(gen.error);
+
+      const dep = await fetch('http://localhost:4311/oai/act', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'deploy.create', params: { productSlug, version: 'latest', env: 'staging', runId: gen.data.runId } })
+      }).then(r => r.json());
+      if (!dep.ok) throw new Error(dep.error);
+    } catch (e: any) {
+      setErr(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-white">
+      <div className="col-span-2 p-4 rounded-xl bg-[rgba(20,20,30,0.85)] backdrop-blur-md border border-cyan-400/30">
+        <h3 className="text-cyan-300 font-semibold mb-2">Chat</h3>
+        <button
+          onClick={() => oneClickShip('login-page')}
+          disabled={busy}
+          className="px-4 py-2 rounded-lg bg-cyan-400 text-black font-semibold shadow-[0_0_12px_#22d3ee] hover:brightness-110 transition"
+        >
+          {busy ? 'Working…' : 'One‑click: Add login + Deploy → Staging'}
+        </button>
+        {err && <p className="text-red-400 mt-2">{err}</p>}
+      </div>
+
+      <div className="p-4 rounded-xl bg-[rgba(20,20,30,0.85)] backdrop-blur-md border border-cyan-400/30">
+        <h3 className="text-cyan-300 font-semibold mb-2">Timeline</h3>
+        <ul className="space-y-2 text-sm text-gray-300 max-h-80 overflow-auto">
+          {events.slice().reverse().map(e => (
+            <li key={e.id} className="border-l-2 border-cyan-400/40 pl-2">
+              <span className="text-cyan-200">{e.source}</span> — {e.type}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+Path: apps/studio/components/TimeMachine.tsx
+
+tsx
+'use client';
+
+import { useMemo, useState } from 'react';
+import { useOAIEvents } from '../lib/useOAIEvents';
+
+export default function TimeMachine() {
+  const events = useOAIEvents();
+  const [selected, setSelected] = useState<string | null>(null);
+
+  const timeline = useMemo(
+    () => events.filter(e => /(run|edit|capsule)\./.test(e.type)).sort((a,b)=>a.ts-b.ts),
+    [events]
+  );
+
+  async function promoteToDeploy(evtId: string) {
+    const snap = timeline.find(e => e.id === evtId);
+    if (!snap) return;
+    const out = `/tmp/${(snap.data as any).name ?? 'app'}.${evtId}.caps`;
+    await fetch('http://localhost:4311/oai/act', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action: 'capsule.pack', params: {
+        appDir: (snap.data as any).appDir ?? '.',
+        manifestPath: (snap.data as any).manifestPath ?? './capsule.json',
+        outPath: out
+      } })
+    });
+    await fetch('http://localhost:4311/oai/act', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action: 'capsule.deploy', params: { filePath: out, env: 'staging' } })
+    });
+  }
+
+  return (
+    <div className="p-4 rounded-xl bg-[rgba(10,12,20,0.7)] backdrop-blur-lg border border-cyan-400/30 text-white">
+      <h3 className="text-cyan-300 font-semibold mb-3">Time Machine</h3>
+      <div className="flex gap-2 overflow-x-auto py-2">
+        {timeline.map(e => (
+          <button key={e.id} onClick={()=>setSelected(e.id)}
+            className={`px-3 py-2 rounded-lg border ${selected===e.id ? 'border-cyan-400 text-cyan-200' : 'border-cyan-400/20 text-gray-300'}`}>
+            <span className="text-xs">{new Date(e.ts).toLocaleTimeString()}</span>
+            <div className="text-sm">{e.source} • {e.type.replace(/^.*\./,'')}</div>
+          </button>
+        ))}
+      </div>
+      <div className="mt-3 flex gap-2">
+        <button
+          onClick={()=>selected && promoteToDeploy(selected)}
+          disabled={!selected}
+          className="px-4 py-2 rounded-lg bg-cyan-400 text-black font-semibold shadow-[0_0_12px_#22d3ee]"
+        >
+          Promote selected → Deploy
+        </button>
+      </div>
+    </div>
+  );
+}
+Path: packages/capsule/package.json
+
+json
+{
+  "name": "@oursynth/capsule",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": { "capsule": "dist/cli.js" },
+  "scripts": { "dev": "tsx src/cli.ts", "build": "tsc -p tsconfig.json" },
+  "dependencies": { "zod": "^3.23.8", "tar": "^6.2.1", "tweetnacl": "^1.0.3" },
+  "devDependencies": { "tsx": "^4.7.0", "typescript": "^5.5.4" }
+}
+Path: packages/capsule/src/manifest.ts
+
+ts
+import { z } from 'zod';
+
+export const CapsuleManifest = z.object({
+  id: z.string(),
+  name: z.string(),
+  version: z.string(),
+  createdAt: z.number(),
+  createdBy: z.object({ name: z.string(), keyId: z.string() }),
+  app: z.object({
+    framework: z.literal('nextjs'),
+    node: z.string().default('20.x'),
+    env: z.record(z.string()).default({})
+  }),
+  services: z.array(z.object({
+    name: z.string(),
+    type: z.enum(['postgres','edge','worker','kv']),
+    config: z.record(z.any()).default({})
+  })).default([]),
+  build: z.object({
+    steps: z.array(z.string()),
+    outDir: z.string().default('.next')
+  }),
+  seeds: z.array(z.object({
+    name: z.string(),
+    type: z.enum(['sql','crdt','files']),
+    path: z.string()
+  })).default([]),
+  attestations: z.array(z.object({
+    type: z.string(),
+    sha256: z.string(),
+    meta: z.record(z.any()).default({})
+  })).default([]),
+  rights: z.object({
+    license: z.string().default('OSL-3.0-or-compatible'),
+    resaleAllowed: z.boolean().default(true),
+    attribution: z.boolean().default(true)
+  }).default({ license: 'OSL-3.0-or-compatible', resaleAllowed: true, attribution: true })
+});
+export type CapsuleManifest = z.infer<typeof CapsuleManifest>;
+Path: packages/capsule/src/crypto.ts
+
+ts
+import nacl from 'tweetnacl';
+import { createHash } from 'crypto';
+
+export function sha256(buf: Buffer | string) {
+  return createHash('sha256').update(buf).digest('hex');
+}
+
+export function generateKeypair() {
+  const kp = nacl.sign.keyPair();
+  return {
+    publicKey: Buffer.from(kp.publicKey).toString('base64'),
+    secretKey: Buffer.from(kp.secretKey).toString('base64')
+  };
+}
+
+export function sign(blob: Buffer, secretKeyB64: string) {
+  const sk = Buffer.from(secretKeyB64, 'base64');
+  const signed = nacl.sign(blob, sk);
+  return Buffer.from(signed);
+}
+
+export function verify(signed: Buffer, publicKeyB64: string) {
+  const pk = Buffer.from(publicKeyB64, 'base64');
+  const opened = nacl.sign.open(signed, pk);
+  return opened ?? null;
+}
+Path: packages/capsule/src/cli.ts
+
+ts
+#!/usr/bin/env node
+import { CapsuleManifest } from './manifest.js';
+import { sign, verify, sha256, generateKeypair } from './crypto.js';
+import { create } from 'tar';
+import { readFileSync, writeFileSync } from 'fs';
+import { resolve } from 'path';
+
+const cmd = process.argv[2];
+
+if (cmd === 'keygen') {
+  const kp = generateKeypair();
+  console.log(JSON.stringify(kp, null, 2));
+  process.exit(0);
+}
+
+if (cmd === 'pack') {
+  const dir = resolve(process.argv[3] || '.');
+  const manifestPath = resolve(process.argv[5]);
+  const outPath = resolve(process.argv[7]);
+
+  const manifestRaw = readFileSync(manifestPath, 'utf8');
+  const manifest = CapsuleManifest.parse(JSON.parse(manifestRaw));
+  const tarStream: any = await create({ gzip: true, cwd: dir }, ['.']);
+  const chunks: Buffer[] = [];
+  await new Promise<void>((resolvePromise, reject) => {
+    tarStream.on('data', (c: Buffer) => chunks.push(c));
+    tarStream.on('end', () => resolvePromise());
+    tarStream.on('error', reject);
+  });
+  const tarBuf = Buffer.concat(chunks);
+  const header = Buffer.from(JSON.stringify({ manifest, hash: sha256(tarBuf) }), 'utf8');
+
+  const sk = process.env.CAPSULE_SECRET!;
+  const signed = sign(Buffer.concat([header, Buffer.from('\n--\n'), tarBuf]), sk);
+  writeFileSync(outPath, signed);
+  console.log(JSON.stringify({ ok: true, outPath }, null, 2));
+  process.exit(0);
+}
+
+if (cmd === 'unpack') {
+  const file = resolve(process.argv[3]);
+  const pk = process.argv[5];
+  const signed = readFileSync(file);
+  const opened = verify(signed, pk);
+  if (!opened) throw new Error('Signature verification failed');
+  const [headerStr] = opened.toString('utf8').split('\n--\n');
+  const header = JSON.parse(headerStr);
+  console.log(JSON.stringify({ ok: true, header, blobBytes: opened.length }, null, 2));
+  process.exit(0);
+}
+
+console.log('Usage: capsule keygen | pack <dir> --manifest <file> --out <file> | unpack <file> --pub <b64>');
+Path: apps/deploy/app/api/deploy/capsule/route.ts
+
+ts
+import { NextRequest, NextResponse } from 'next/server';
+import { verify } from '@oursynth/capsule/src/crypto.js';
+import { readFileSync } from 'fs';
+
+export async function POST(req: NextRequest) {
+  const { filePath, env } = await req.json();
+  if (!filePath || !env) return NextResponse.json({ error: 'filePath and env required' }, { status: 400 });
+
+  const signed = readFileSync(filePath);
+  const opened = verify(signed, process.env.CAPSULE_PUBLIC!);
+  if (!opened) return NextResponse.json({ ok: false, error: 'Invalid signature' }, { status: 400 });
+
+  // TODO: reconstruct workspace, run manifest.build steps, deploy to target env
+  // For now, return stubbed success
+  return NextResponse.json({ ok: true, env });
+}
+Path: packages/mesh-node/src/index.ts
+
+ts
+import mdns from 'multicast-dns';
+import http from 'http';
+import { readdirSync, readFileSync } from 'fs';
+const capsDir = process.env.CAPSULE_DIR || './capsules';
+
+const server = http.createServer((req, res) => {
+  if (req.url === '/capsules') {
+    const files = readdirSync(capsDir).filter(f => f.endsWith('.caps'));
+    res.setHeader('Content-Type','application/json');
+    res.end(JSON.stringify(files));
+  } else if (req.url?.startsWith('/capsule/')) {
+    const name = decodeURIComponent(req.url.split('/capsule/')[1]);
+    const buf = readFileSync(`${capsDir}/${name}`);
+    res.setHeader('Content-Type','application/octet-stream');
+    res.end(buf);
+  } else { res.statusCode = 404; res.end(); }
+});
+server.listen(7423);
+
+const md = mdns();
+setInterval(() => {
+  md.respond({ answers: [{ name: '_oursynth._tcp.local', type: 'SRV', data: { port: 7423, target: 'mesh.local' } }] });
+}, 2000);
+Path: tools/scripts/integrate-domains.ps1
+
+powershell
+param(
+  [string]$Root = ".",
+  [string]$SourcePath,
+  [string]$Port = "3003",
+  [string]$SupabaseUrl,
+  [string]$SupabaseAnonKey,
+  [string]$SupabaseServiceRoleKey,
+  [switch]$CreateApi

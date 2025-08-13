@@ -1,0 +1,44 @@
+Copilot Instructions for OurSynth‑Eco
+Vision & Principles
+Unified Platform: Pathways (prompt-driven app generator), Deploy (orchestration/status), Domains (management), Store/Showcase (platform & premium apps), Halo UI (design system)
+Design Principles: Minimal surface area, composability, strong defaults, visual coherence via Halo UI
+Philosophy: "Slow is smooth. Smooth is fast." — deliberate, inevitable progress
+Monorepo Layout (Turborepo + Changesets)
+Why Turborepo: Fast caching, layered builds, simple mental model. Prefer custom scripts in workflows/ over Nx.
+Halo UI: Foundation & Conventions
+Tech: React + TypeScript, Tailwind, Radix Primitives, Framer Motion
+
+Structure:
+packages/halo-ui/
+  src/
+    tokens/       # theme.ts, motion.ts, shadows.ts
+    primitives/   # Button, Input, Switch, Dialog, Tabs, Tooltip
+    surfaces/     # Card, Panel, Sheet, GlassLayer
+    feedback/     # Toast, Progress, Skeleton
+    data/         # Table, List, EmptyState
+    app-ops/      # PromptInput, ModelSelector, DeployBadge, DomainBadge
+    hooks/        # useTheme, useMotionPref, useKeypress
+    css/          # halo.css (CSS vars), tailwind-plugin.ts
+  index.ts
+Design Tokens:
+Colors: Halogen palette (plasma/neon), neutrals for glass
+Elevation: Blurs, inner/outer glows
+Motion: Micro-interactions (100–250ms), page transitions (250–400ms), spring presets
+Rounding: 10/14/18 for geometry, 9999 for pills
+Density: Compact/comfy via CSS vars
+Theming: CSS variables in halo.css, Tailwind plugin for utilities, data-theme="dark|light|neon" for runtime switching, Radix reset included
+
+Colors: Halogen palette (plasma/neon), neutrals for glass
+Elevation: Blurs, inner/outer glows
+Motion: Micro-interactions (100–250ms), page transitions (250–400ms), spring presets
+Rounding: 10/14/18 for geometry, 9999 for pills
+Density: Compact/comfy via CSS vars
+Theming: CSS variables in halo.css, Tailwind plugin for utilities, data-theme="dark|light|neon" for runtime switching, Radix reset included
+
+References
+apps/ — main applications
+packages/halo-ui/ — design system
+packages/workflows/ — prompt blueprints, templates
+infra/ — infrastructure (Supabase, CI)
+turbo.json — Turborepo config
+For new patterns or questions, check the latest blueprints in workflows/ or the most recent app demos. Update this file if you introduce new conventions or workflows.
