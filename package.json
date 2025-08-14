@@ -3,6 +3,13 @@
   "private": true,
   "version": "1.0.0",
   "packageManager": "pnpm@10.14.0",
+  "scripts": {
+    "bootstrap": "pnpm install && pnpm approve-builds --yes && pnpm -r --if-present build",
+    "dev": "pnpm -r --parallel --if-present dev",
+    "test": "pnpm -r --if-present test",
+    "registry:generate": "node scripts/generate-registry.mjs",
+    "health-check": "node scripts/health-check.mjs"
+  },
   "devDependencies": {
     "@playwright/test": "^1.54.2",
     "@types/react": "^19.1.10"

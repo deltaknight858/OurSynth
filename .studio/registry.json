@@ -1,0 +1,12 @@
+[
+  {
+    "id": "scaffold-component",
+    "description": "Generate a new UI component in ui-components workspace",
+    "params": ["name"]
+  },
+  {
+    "id": "add-route",
+    "description": "Add a new route to the web-app",
+    "params": ["route"]
+  }
+]

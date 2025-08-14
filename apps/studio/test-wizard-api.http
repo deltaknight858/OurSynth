@@ -1,0 +1,16 @@
+### List actions
+GET http://localhost:3000/api/wizard/actions
+
+### Invoke action
+POST http://localhost:3000/api/wizard/actions/scaffold-component/invoke
+Content-Type: application/json
+
+{
+  "inputs": { "componentName": "Card", "package": "packages/halo-ui" }
+}
+
+### Await invocation (replace with real ID)
+GET http://localhost:3000/api/wizard/invocations/{{invocationId}}
+
+### Fetch artifact (replace with real ID)
+GET http://localhost:3000/api/wizard/artifacts/{{artifactId}}
