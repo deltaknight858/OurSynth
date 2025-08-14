@@ -1,0 +1,8 @@
+
+{
+  "files": [],
+  "references": [
+    { "path": "apps/studio" },
+    { "path": "packages/halo-ui" }
+  ]
+}

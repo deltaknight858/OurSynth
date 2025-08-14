@@ -113,12 +113,12 @@ function TemplateCard({ product }: { product: Product }) {
               className="halo-btn px-4 py-2 rounded-lg text-white bg-cyan-800 hover:bg-cyan-600 transition border border-cyan-400 shadow-neon disabled:opacity-60"
               onClick={handleDownload}
               disabled={loading}
-            ></button>
+            >
               {loading ? 'Downloading...' : 'Download'}
             </button>
           </>
         )}
-        <Link href={`/studio/store/${product.slug}`}></Link>
+        <Link href={`/studio/store/${product.slug}`}>
           <button className="halo-btn px-3 py-2 rounded-lg text-cyan-400 border border-cyan-400 bg-transparent hover:bg-cyan-900/40 shadow-neon text-xs">
             Details
           </button>

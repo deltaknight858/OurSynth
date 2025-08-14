@@ -4,6 +4,13 @@
   "version": "1.0.0",
   "packageManager": "pnpm@10.14.0",
   "devDependencies": {
+    "@playwright/test": "^1.54.2",
     "@types/react": "^19.1.10"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "framer-motion": "10.x",
+    "next": "^15.4.6",
+    "zod": "^3.25.76"
   }
 }

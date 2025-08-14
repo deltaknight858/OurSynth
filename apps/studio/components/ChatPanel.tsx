@@ -2,6 +2,7 @@
 'use client';
 import { useState } from 'react';
 import { useOAIEvents } from '../lib/useOAIEvents';
+import { HaloScrollArea } from '@oursynth/halo-ui';
 import PromptForm from './wizard/PromptForm';
 import WizardStream from './wizard/WizardStream';
 import DiffViewer from './wizard/DiffViewer';
@@ -35,7 +36,9 @@ export default function ChatPanel() {
       )}
       {err && <div className="text-red-400">{err}</div>}
       {/* Timeline of events (optional):
-      <pre className="text-xs text-cyan-300 bg-black/30 rounded p-2 overflow-x-auto max-h-40">{JSON.stringify(events, null, 2)}</pre> */}
+      <HaloScrollArea className="max-h-40 bg-black/30 rounded p-2 text-xs text-cyan-300">
+        <pre className="m-0">{JSON.stringify(events, null, 2)}</pre>
+      </HaloScrollArea> */}
     </div>
   );
 }

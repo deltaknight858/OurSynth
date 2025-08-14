@@ -1,7 +1,7 @@
 // apps/studio/deploy/components/DeployForm.tsx
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { InputField } from './ui/InputField';
+import { Input } from './ui/input';
 import { TabSwitcher } from './ui/TabSwitcher';
 import { HaloButton } from './ui/HaloButton';
 
@@ -32,25 +32,31 @@ export function DeployForm() {
         activeTab={activeProvider}
         onTabChange={setActiveProvider}
       />
-      <InputField
-        label="Project Name"
-        value={projectName}
-        onChange={setProjectName}
-        placeholder="my-awesome-app"
-      />
+      <div>
+        <label className="block text-sm font-medium text-white mb-1">Project Name</label>
+        <Input
+          value={projectName}
+          onChange={e => setProjectName(e.target.value)}
+          placeholder="my-awesome-app"
+        />
+      </div>
       <div className="grid grid-cols-2 gap-4">
-        <InputField
-          label="Environment"
-          value={environment}
-          onChange={setEnvironment}
-          placeholder="production"
-        />
-        <InputField
-          label="Region"
-          value={region}
-          onChange={setRegion}
-          placeholder="Select region"
-        />
+        <div>
+          <label className="block text-sm font-medium text-white mb-1">Environment</label>
+          <Input
+            value={environment}
+            onChange={e => setEnvironment(e.target.value)}
+            placeholder="production"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-white mb-1">Region</label>
+          <Input
+            value={region}
+            onChange={e => setRegion(e.target.value)}
+            placeholder="Select region"
+          />
+        </div>
       </div>
       <div className="mt-6 flex gap-4">
         <HaloButton

@@ -1,0 +1,59 @@
+:root {
+  --sb-width: 14px;
+  --sb-track: rgba(18, 20, 22, 0.35);
+  --sb-thumb-start: rgba(0, 255, 255, 0.95);
+  --sb-thumb-end: rgba(0, 160, 255, 0.95);
+  --sb-thumb-border: rgba(18, 20, 22, 0.6);
+  --sb-glow: 0 0 10px rgba(0, 255, 255, 0.55);
+  --sb-glow-active: 0 0 14px rgba(0, 255, 255, 0.95);
+  --sb-transition: 0.15s ease;
+}
+
+.root {
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sb-thumb-start) var(--sb-track);
+}
+
+/* WebKit */
+.root::-webkit-scrollbar {
+  width: var(--sb-width);
+  height: var(--sb-width);
+}
+.root::-webkit-scrollbar-track {
+  background: var(--sb-track);
+  border-radius: 999px;
+}
+.root::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--sb-thumb-start), var(--sb-thumb-end));
+  border-radius: calc(var(--sb-width) / 2);
+  border: 2px solid var(--sb-thumb-border);
+  box-shadow: var(--sb-glow);
+  transition: box-shadow var(--sb-transition), filter var(--sb-transition);
+}
+.root:hover::-webkit-scrollbar {
+  width: calc(var(--sb-width) + 2px);
+  height: calc(var(--sb-width) + 2px);
+}
+.root:hover::-webkit-scrollbar-thumb {
+  box-shadow: var(--sb-glow-active);
+}
+
+.isScrolling::-webkit-scrollbar-thumb {
+  box-shadow: var(--sb-glow-active);
+  filter: saturate(1.15);
+}
+
+/* Respect user settings */
+@media (prefers-reduced-motion: reduce) {
+  .root::-webkit-scrollbar-thumb {
+    transition: none;
+  }
+}
+
+/* High-contrast fallback */
+@media (forced-colors: active) {
+  .root {
+    scrollbar-color: ButtonText ButtonFace;
+  }
+}

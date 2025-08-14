@@ -121,7 +121,8 @@ export function verify(signed: Buffer, publicKeyB64: string) {
 
 src/cli.ts
 
-#!/usr/bin/env node
+# !/usr/bin/env node
+
 import { CapsuleManifest } from './manifest.js';
 import { sign, verify, sha256 } from './crypto.js';
 import { create } from 'tar';
@@ -245,7 +246,7 @@ packages/oai/src/tools.ts (append)
 
 export { capsuleTools as toolsCapsule } from './tools.capsule';
 export const tools = [
-  /* existing tools... */,
+  /*existing tools...*/,
   ...require('./tools.capsule').capsuleTools
 ];
 
@@ -273,7 +274,7 @@ export function TimeMachine() {
     const snap = timeline.find(e => e.id === evtId);
     if (!snap) return;
     const out = `/tmp/${(snap.data as any).name ?? 'app'}.${evtId}.caps`;
-    await fetch('http://localhost:4311/oai/act', {
+    await fetch('<http://localhost:4311/oai/act>', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ action: 'capsule.pack', params: {
         appDir: (snap.data as any).appDir ?? process.env.NEXT_PUBLIC_APP_DIR ?? '.',
@@ -281,7 +282,7 @@ export function TimeMachine() {
         outPath: out
       } })
     });
-    await fetch('http://localhost:4311/oai/act', {
+    await fetch('<http://localhost:4311/oai/act>', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ action: 'capsule.deploy', params: { filePath: out, env: 'staging' } })
     });
@@ -347,7 +348,7 @@ const server = http.createServer((req, res) => {
     res.setHeader('Content-Type','application/json');
     res.end(JSON.stringify(files));
   } else if (req.url?.startsWith('/capsule/')) {
-    const name = decodeURIComponent(req.url.split('/capsule/')[1]);
+    const name = decodeURIComponent(req.url.split['/capsule/'](1));
     const buf = readFileSync(`${capsDir}/${name}`);
     res.setHeader('Content-Type','application/octet-stream');
     res.end(buf);
@@ -367,7 +368,7 @@ Studio: lightweight peer browser (optional)
 import { useEffect, useState } from 'react';
 export function MeshCapsules() {
   const [files,setFiles] = useState<string[]>([]);
-  useEffect(()=>{ fetch('http://mesh.local:7423/capsules').then(r=>r.json()).then(setFiles); },[]);
+  useEffect(()=>{ fetch('<http://mesh.local:7423/capsules').then(r=>r.json()).then(setFiles>); },[]);
   return (
     <div className="p-4 rounded-xl border border-cyan-400/30">
       <h3 className="text-cyan-300 font-semibold mb-2">LAN Capsules</h3>
@@ -477,7 +478,7 @@ tsx
   icon={<LucideNotebook />}
   title="Copilot Pages"
   description="Editable surfaces for long-form work. Saved automatically. Not downloadable."
-  action={<HaloButton label="Learn More" onClick={() => openLink('http://aka.ms/copilot-pages-help')} />}
+  action={<HaloButton label="Learn More" onClick={() => openLink('<http://aka.ms/copilot-pages-help')}> />}
 />
 🔗 Related Components
 EmptyState: Used for each instruction block
