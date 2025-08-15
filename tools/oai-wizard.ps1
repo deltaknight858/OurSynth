@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
   [Parameter(Position=0, Mandatory=$true)]
-  [ValidateSet('actions','invoke','await','harvest','apply','pr')]
+  [ValidateSet('actions','invoke','await','harvest','apply','pr','health')]
   [string]$Cmd,
 
   [string]$ActionId,
@@ -75,7 +75,7 @@ switch ($Cmd) {
     if (-not $InvocationId) { throw "InvocationId required" }
     $root = Resolve-RepoRoot
     $inbox = Join-Path $root ".studio/inbox/$InvocationId"
-    New-Item -ItemType Directory -Force $inbox | Out-Null
+    New-Item -ItemType Directory -Force (Split-Path $inbox) | Out-Null
 
     $state = Http-Get "$WizardUrl/api/wizard/invocations/$InvocationId"
     foreach ($a in $state.artifacts) {
@@ -133,6 +133,27 @@ switch ($Cmd) {
     } catch {
       Write-Host "PR not opened automatically. Use your VCS provider to open a PR for $branch." -ForegroundColor Yellow
     }
+    break
+  }
+
+  'health' {
+    Write-Host "Running health checks..."
+    $root = Resolve-RepoRoot
+    
+    # Execute the command and capture its output
+    $process = Start-Process -FilePath "pnpm" -ArgumentList "health-check" -WorkingDirectory $root -NoNewWindow -PassThru -RedirectStandardOutput $true -RedirectStandardError $true
+    $process.WaitForExit()
+
+    $stdout = $process.StandardOutput.ReadToEnd()
+    $stderr = $process.StandardError.ReadToEnd()
+
+    if ($stdout) { Write-Host $stdout }
+    if ($stderr) { Write-Error $stderr }
+
+    if ($process.ExitCode -ne 0) {
+      throw "Health checks failed with exit code $($process.ExitCode)."
+    }
+    Write-Host "Health checks completed successfully."
     break
   }
 }

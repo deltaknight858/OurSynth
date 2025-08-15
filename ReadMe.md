@@ -100,3 +100,19 @@ Apache-2.0
 ---
 
 For more, see the docs in `apps/web/app/(docs)/` or
+
+---
+
+## 🛠️ Automation & Tooling
+
+### Mesh Simulation
+
+To run a mesh simulation with provenance tracking, use the `mesh-sim-provenance-and-preview.ps1` script. This is useful for testing capsule integrity and network conditions.
+
+**Usage:**
+
+```powershell
+pwsh ./scripts/mesh-sim-provenance-and-preview.ps1 -CapsuleHash <yourCapsuleHash> -Nodes 5 -Latency "50-150" -PacketLoss 0.05 -ChaosMode -VerifySignatures
+```
+
+This script can also be triggered from the Studio Command Center as the "Simulate Mesh" action.

@@ -1,8 +1,9 @@
-
 {
-  "files": [],
-  "references": [
-    { "path": "apps/studio" },
-    { "path": "packages/halo-ui" }
+  "include": [
+    "apps/**/*.{ts,tsx,js,jsx}",
+    "packages/**/*.{ts,tsx,js,jsx}",
+    "pushable-agent-action/**/*.{ts,tsx,js,jsx}",
+    "tests/**/*.{ts,tsx,js,jsx}",
+    "vitest.config.ts"
   ]
 }

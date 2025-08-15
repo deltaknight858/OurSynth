@@ -1,0 +1,23 @@
+[
+  {
+    "id": "capture-empty-state",
+    "label": "Capture EmptyState",
+    "icon": "LucideCamera",
+    "run": "pnpm capture:emptystate:ps",
+    "group": "UI Demos"
+  },
+  {
+    "id": "pack-capsule",
+    "label": "Pack Capsule",
+    "icon": "LucidePackage",
+    "run": "pnpm os pack",
+    "group": "Deploy"
+  },
+  {
+    "id": "simulate-mesh",
+    "label": "Simulate Mesh",
+    "icon": "LucideNetwork",
+    "run": "pwsh ./scripts/mesh-sim-provenance-and-preview.ps1",
+    "group": "Testing"
+  }
+]
