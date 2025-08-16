@@ -1,7 +1,7 @@
 {
   "extends": ["../../.eslintrc.cjs", "next/core-web-vitals", "next/typescript"],
   "parserOptions": {
-    "project": "./tsconfig.json"
+    "project": "./tsconfig.eslint.json"
   },
   "rules": {
     "@typescript-eslint/no-unused-vars": [

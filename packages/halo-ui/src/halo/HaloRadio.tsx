@@ -1,8 +1,9 @@
 // HaloRadio.tsx
 // A Halo UI radio group with optional dynamic audio visualizer
 
-import React from "react";
-import { cn } from "../lib/utils";
+import React from 'react';
+
+import { cn } from '../lib/utils';
 
 export interface HaloRadioOption {
   label: string;
@@ -31,19 +32,25 @@ export const HaloRadio: React.FC<HaloRadioProps> = ({
   disabled = false,
   showVisualizer = false,
   visualizerLevel = 0,
-  className
+  className,
 }) => {
   return (
-    <fieldset className={cn("space-y-2", className)} disabled={disabled}>
-      {label && <legend className="block text-sm font-medium text-[rgb(var(--halo-fg))] mb-2">{label}</legend>}
+    <fieldset className={cn('space-y-2', className)} disabled={disabled}>
+      {label && (
+        <legend className="block text-sm font-medium text-[rgb(var(--halo-fg))] mb-2">
+          {label}
+        </legend>
+      )}
       <div className="flex flex-col gap-2">
         {options.map((opt) => (
           <label
             key={opt.value}
             className={cn(
-              "flex items-center gap-3 cursor-pointer select-none p-2 rounded-halo transition-all",
-              value === opt.value ? "bg-[rgba(var(--halo-primary),0.08)]" : "hover:bg-[rgba(var(--halo-fg),0.03)]",
-              opt.disabled && "opacity-50 cursor-not-allowed"
+              'flex items-center gap-3 cursor-pointer select-none p-2 rounded-halo transition-all',
+              value === opt.value
+                ? 'bg-[rgba(var(--halo-primary),0.08)]'
+                : 'hover:bg-[rgba(var(--halo-fg),0.03)]',
+              opt.disabled && 'opacity-50 cursor-not-allowed',
             )}
           >
             <input
@@ -60,12 +67,15 @@ export const HaloRadio: React.FC<HaloRadioProps> = ({
               <span className="ml-2 flex items-center h-4">
                 <span
                   className={cn(
-                    "block w-6 h-2 rounded bg-[rgb(var(--halo-primary))] transition-all duration-200",
-                    "halo-radio-visualizer"
+                    'block w-6 h-2 rounded bg-[rgb(var(--halo-primary))] transition-all duration-200',
+                    'halo-radio-visualizer',
                   )}
                   data-width={16 + 24 * visualizerLevel}
                   data-opacity={0.7 + 0.3 * visualizerLevel}
-                  style={{ width: `${16 + 24 * visualizerLevel}px`, opacity: 0.7 + 0.3 * visualizerLevel }}
+                  style={{
+                    width: `${16 + 24 * visualizerLevel}px`,
+                    opacity: 0.7 + 0.3 * visualizerLevel,
+                  }}
                 />
               </span>
             )}

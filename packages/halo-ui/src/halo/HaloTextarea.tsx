@@ -1,31 +1,36 @@
 // Migrated from apps/Halo-UI/src/components/halo/HaloTextarea.tsx
 
-"use client";
+'use client';
 
-import React from "react";
-import { motion } from "framer-motion";
-import { cn } from "../lib/utils";
+import { motion } from 'framer-motion';
+import React from 'react';
+
+import { cn } from '../lib/utils';
 
 export interface HaloTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-  variant?: "glass" | "elevated" | "minimal";
+  variant?: 'glass' | 'elevated' | 'minimal';
   error?: boolean;
   label?: string;
   helperText?: string;
 }
 
 const HaloTextarea = React.forwardRef<HTMLTextAreaElement, HaloTextareaProps>(
-  ({ variant = "glass", error = false, label, helperText, className, ...props }, ref) => {
-    const baseClasses = "w-full rounded-halo border bg-transparent text-[rgb(var(--halo-fg))] placeholder:text-[rgb(var(--halo-muted))] transition-all duration-[var(--halo-duration)] ease-[var(--halo-ease)] focus:outline-none halo-focus-ring resize-y min-h-[100px]";
-    
+  ({ variant = 'glass', error = false, label, helperText, className, ...props }, ref) => {
+    const baseClasses =
+      'w-full rounded-halo border bg-transparent text-[rgb(var(--halo-fg))] placeholder:text-[rgb(var(--halo-muted))] transition-all duration-[var(--halo-duration)] ease-[var(--halo-ease)] focus:outline-none halo-focus-ring resize-y min-h-[100px]';
+
     const variantClasses = {
-      glass: "halo-glass border-[rgba(var(--halo-fg),0.1)] focus:border-[rgba(var(--halo-primary),0.3)] focus:shadow-[0_0_20px_rgba(var(--halo-primary),0.1)]",
-      elevated: "bg-[rgb(var(--halo-bg-elev))] border-[rgba(var(--halo-fg),0.2)] focus:border-[rgba(var(--halo-primary),0.5)] shadow-sm",
-      minimal: "border-[rgba(var(--halo-fg),0.2)] focus:border-[rgba(var(--halo-primary),0.5)] hover:border-[rgba(var(--halo-fg),0.3)]"
+      glass:
+        'halo-glass border-[rgba(var(--halo-fg),0.1)] focus:border-[rgba(var(--halo-primary),0.3)] focus:shadow-[0_0_20px_rgba(var(--halo-primary),0.1)]',
+      elevated:
+        'bg-[rgb(var(--halo-bg-elev))] border-[rgba(var(--halo-fg),0.2)] focus:border-[rgba(var(--halo-primary),0.5)] shadow-sm',
+      minimal:
+        'border-[rgba(var(--halo-fg),0.2)] focus:border-[rgba(var(--halo-primary),0.5)] hover:border-[rgba(var(--halo-fg),0.3)]',
     };
 
-    const errorClasses = error 
-      ? "border-[rgb(var(--halo-secondary))] focus:border-[rgb(var(--halo-secondary))] focus:shadow-[0_0_20px_rgba(var(--halo-secondary),0.2)]"
-      : "";
+    const errorClasses = error
+      ? 'border-[rgb(var(--halo-secondary))] focus:border-[rgb(var(--halo-secondary))] focus:shadow-[0_0_20px_rgba(var(--halo-secondary),0.2)]'
+      : '';
 
     return (
       <div className="space-y-2">
@@ -43,18 +48,18 @@ const HaloTextarea = React.forwardRef<HTMLTextAreaElement, HaloTextareaProps>(
           ref={ref}
           className={cn(
             baseClasses,
-            "px-4 py-3 text-sm",
+            'px-4 py-3 text-sm',
             variantClasses[variant],
             errorClasses,
-            className
+            className,
           )}
           {...props}
         />
         {(helperText || error) && (
           <motion.p
             className={cn(
-              "text-xs",
-              error ? "text-[rgb(var(--halo-secondary))]" : "text-[rgb(var(--halo-muted))]"
+              'text-xs',
+              error ? 'text-[rgb(var(--halo-secondary))]' : 'text-[rgb(var(--halo-muted))]',
             )}
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
@@ -65,9 +70,9 @@ const HaloTextarea = React.forwardRef<HTMLTextAreaElement, HaloTextareaProps>(
         )}
       </div>
     );
-  }
+  },
 );
 
-HaloTextarea.displayName = "HaloTextarea";
+HaloTextarea.displayName = 'HaloTextarea';
 
 export default HaloTextarea;

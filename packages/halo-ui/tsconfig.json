@@ -14,7 +14,11 @@
   },
   "include": [
     "src/**/*",
-    "src/**/*.d.ts"
+    "src/**/*.d.ts",
+    "src/halo/*.tsx",
+    "src/halo/*.ts",
+    "src/halo/**/*.tsx",
+    "src/halo/**/*.ts"
   ],
   "exclude": ["node_modules", "dist"]
 }

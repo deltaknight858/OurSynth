@@ -1,9 +1,10 @@
-"use client";
+'use client';
 
-import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "../lib/utils";
-import { CloseIcon } from "./icons";
+import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
+
+import { CloseIcon } from './icons';
+import { cn } from '../lib/utils';
 
 export interface HaloDialogProps {
   open: boolean;
@@ -20,25 +21,28 @@ export default function HaloDialog({
   children,
   title,
   description,
-  className
+  className,
 }: HaloDialogProps) {
-  const handleEscape = React.useCallback((e: KeyboardEvent) => {
-    if (e.key === "Escape") {
-      onOpenChange(false);
-    }
-  }, [onOpenChange]);
+  const handleEscape = React.useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onOpenChange(false);
+      }
+    },
+    [onOpenChange],
+  );
 
   React.useEffect(() => {
     if (open) {
-      document.addEventListener("keydown", handleEscape);
-      document.body.style.overflow = "hidden";
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = 'unset';
     }
 
     return () => {
-      document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "unset";
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
     };
   }, [open, handleEscape]);
 
@@ -57,29 +61,29 @@ export default function HaloDialog({
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div
               className={cn(
-                "relative w-full max-w-lg halo-glass-strong rounded-halo-lg shadow-[var(--halo-shadow)] border border-[rgba(var(--halo-fg),0.1)]",
-                className
+                'relative w-full max-w-lg halo-glass-strong rounded-halo-lg shadow-[var(--halo-shadow)] border border-[rgba(var(--halo-fg),0.1)]',
+                className,
               )}
-              initial={{ 
-                opacity: 0, 
-                scale: 0.95, 
+              initial={{
+                opacity: 0,
+                scale: 0.95,
                 y: 20,
-                filter: "blur(4px)"
+                filter: 'blur(4px)',
               }}
-              animate={{ 
-                opacity: 1, 
-                scale: 1, 
+              animate={{
+                opacity: 1,
+                scale: 1,
                 y: 0,
-                filter: "blur(0px)"
+                filter: 'blur(0px)',
               }}
-              exit={{ 
-                opacity: 0, 
-                scale: 0.95, 
+              exit={{
+                opacity: 0,
+                scale: 0.95,
                 y: 20,
-                filter: "blur(4px)"
+                filter: 'blur(4px)',
               }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
-              onClick={e => e.stopPropagation()}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              onClick={(e) => e.stopPropagation()}
             >
               <button
                 className="absolute top-3 right-3 text-[rgb(var(--halo-muted))] hover:text-[rgb(var(--halo-fg))]"

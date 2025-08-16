@@ -6,7 +6,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "lint": "eslint --ext .ts,.tsx src/halo"
   },
   "dependencies": {
     "clsx": "^2.1.1",

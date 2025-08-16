@@ -1,12 +1,10 @@
-// Migrated from apps/Halo-UI/src/components/halo/HaloSelect.tsx
+'use client';
 
-"use client";
+import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
 
-import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "./lib/utils";
-import { ChevronDownIcon, CheckIcon } from "./icons";
-
+import { ChevronDownIcon, CheckIcon } from './icons';
+import { cn } from './lib/utils';
 
 export interface HaloSelectOption {
   value: string;
@@ -14,9 +12,9 @@ export interface HaloSelectOption {
   disabled?: boolean;
 }
 
-
 // Remove 'size' from SelectHTMLAttributes to avoid type conflict
-export interface HaloSelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'size'> {
+export interface HaloSelectProps
+  extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'size'> {
   label?: string;
   options: HaloSelectOption[];
   error?: string;
@@ -24,28 +22,26 @@ export interface HaloSelectProps extends Omit<React.SelectHTMLAttributes<HTMLSel
   variant?: 'glass' | 'elevated' | 'minimal';
 }
 
-export const HaloSelect: React.FC<HaloSelectProps> = ({
-  label,
-  options,
-  error,
-  ...props
-}) => {
+export const HaloSelect: React.FC<HaloSelectProps> = ({ label, options, error, ...props }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [focusedIndex, setFocusedIndex] = React.useState(-1);
-  const selectRef = React.useRef<HTMLButtonElement>(null);
+  const selectRef = React.useRef<HTMLDivElement>(null);
 
-  const selectedOption = options.find(opt => opt.value === props.value);
+  const selectedOption = options.find((opt) => opt.value === props.value);
 
   const sizeClasses = {
-    sm: "px-3 py-1.5 text-sm",
-    md: "px-4 py-2 text-sm", 
-    lg: "px-6 py-3 text-base"
+    sm: 'px-3 py-1.5 text-sm',
+    md: 'px-4 py-2 text-sm',
+    lg: 'px-6 py-3 text-base',
   };
 
   const variantClasses = {
-    glass: "halo-glass border-[rgba(var(--halo-fg),0.1)] focus:border-[rgba(var(--halo-primary),0.3)] focus:shadow-[0_0_20px_rgba(var(--halo-primary),0.1)]",
-    elevated: "bg-[rgb(var(--halo-bg-elev))] border-[rgba(var(--halo-fg),0.2)] focus:border-[rgba(var(--halo-primary),0.5)] shadow-sm",
-    minimal: "border-[rgba(var(--halo-fg),0.2)] focus:border-[rgba(var(--halo-primary),0.5)] hover:border-[rgba(var(--halo-fg),0.3)]"
+    glass:
+      'halo-glass border-[rgba(var(--halo-fg),0.1)] focus:border-[rgba(var(--halo-primary),0.3)] focus:shadow-[0_0_20px_rgba(var(--halo-primary),0.1)]',
+    elevated:
+      'bg-[rgb(var(--halo-bg-elev))] border-[rgba(var(--halo-fg),0.2)] focus:border-[rgba(var(--halo-primary),0.5)] shadow-sm',
+    minimal:
+      'border-[rgba(var(--halo-fg),0.2)] focus:border-[rgba(var(--halo-primary),0.5)] hover:border-[rgba(var(--halo-fg),0.3)]',
   };
 
   const handleToggle = () => {
@@ -60,7 +56,7 @@ export const HaloSelect: React.FC<HaloSelectProps> = ({
       // Create a synthetic event to match React's expected signature
       const event = {
         ...new Event('change'),
-        target: { value: optionValue }
+        target: { value: optionValue },
       } as unknown as React.ChangeEvent<HTMLSelectElement>;
       props.onChange(event);
     }
@@ -72,8 +68,8 @@ export const HaloSelect: React.FC<HaloSelectProps> = ({
     if (props.disabled) return;
 
     switch (e.key) {
-      case "Enter":
-      case " ":
+      case 'Enter':
+      case ' ':
         e.preventDefault();
         if (isOpen && focusedIndex >= 0) {
           handleSelect(options[focusedIndex].value);
@@ -81,32 +77,32 @@ export const HaloSelect: React.FC<HaloSelectProps> = ({
           handleToggle();
         }
         break;
-      case "Escape":
+      case 'Escape':
         setIsOpen(false);
         break;
-      case "ArrowDown":
+      case 'ArrowDown':
         e.preventDefault();
         if (isOpen) {
-          setFocusedIndex(prev => Math.min(prev + 1, options.length - 1));
+          setFocusedIndex((prev) => Math.min(prev + 1, options.length - 1));
         } else {
           setIsOpen(true);
         }
         break;
-      case "ArrowUp":
+      case 'ArrowUp':
         e.preventDefault();
         if (isOpen) {
-          setFocusedIndex(prev => Math.max(prev - 1, 0));
+          setFocusedIndex((prev) => Math.max(prev - 1, 0));
         }
         break;
     }
   };
 
-  const errorClasses = error 
-    ? "border-[rgb(var(--halo-secondary))] focus:border-[rgb(var(--halo-secondary))] focus:shadow-[0_0_20px_rgba(var(--halo-secondary),0.2)]"
-    : "";
+  const errorClasses = error
+    ? 'border-[rgb(var(--halo-secondary))] focus:border-[rgb(var(--halo-secondary))] focus:shadow-[0_0_20px_rgba(var(--halo-secondary),0.2)]'
+    : '';
 
   return (
-    <div className={cn("relative", props.className)}>
+    <div className={cn('relative', props.className)}>
       {label && (
         <motion.label
           className="block text-sm font-medium text-[rgb(var(--halo-fg))] mb-2"
@@ -119,7 +115,7 @@ export const HaloSelect: React.FC<HaloSelectProps> = ({
       )}
 
       <div
-        ref={selectRef as any}
+        ref={selectRef}
         tabIndex={0}
         role="combobox"
         aria-controls="halo-select-listbox"
@@ -127,26 +123,29 @@ export const HaloSelect: React.FC<HaloSelectProps> = ({
         aria-haspopup="listbox"
         aria-label={label}
         className={cn(
-          "relative w-full flex items-center justify-between rounded-halo border bg-transparent text-left transition-all duration-[var(--halo-duration)] ease-[var(--halo-ease)] focus:outline-none halo-focus-ring cursor-pointer",
-          sizeClasses[(props.size as 'sm' | 'md' | 'lg') || "md"],
-          variantClasses[(props.variant as 'glass' | 'elevated' | 'minimal') || "glass"],
+          'relative w-full flex items-center justify-between rounded-halo border bg-transparent text-left transition-all duration-[var(--halo-duration)] ease-[var(--halo-ease)] focus:outline-none halo-focus-ring cursor-pointer',
+          sizeClasses[(props.size as 'sm' | 'md' | 'lg') || 'md'],
+          variantClasses[(props.variant as 'glass' | 'elevated' | 'minimal') || 'glass'],
           errorClasses,
-          props.disabled && "opacity-50 cursor-not-allowed"
+          props.disabled && 'opacity-50 cursor-not-allowed',
         )}
         onClick={handleToggle}
         onKeyDown={handleKeyDown}
         aria-disabled={props.disabled ? 'true' : 'false'}
       >
-        <span className={cn(
-          selectedOption ? "text-[rgb(var(--halo-fg))]" : "text-[rgb(var(--halo-muted))]"
-        )}>
-          {selectedOption?.label || "Select an option"}
-        </span>
-        <ChevronDownIcon 
-          width={16} height={16}
+        <span
           className={cn(
-            "text-[rgb(var(--halo-muted))] transition-transform duration-200",
-            isOpen && "rotate-180"
+            selectedOption ? 'text-[rgb(var(--halo-fg))]' : 'text-[rgb(var(--halo-muted))]',
+          )}
+        >
+          {selectedOption?.label || 'Select an option'}
+        </span>
+        <ChevronDownIcon
+          width={16}
+          height={16}
+          className={cn(
+            'text-[rgb(var(--halo-muted))] transition-transform duration-200',
+            isOpen && 'rotate-180',
           )}
         />
       </div>
@@ -156,9 +155,9 @@ export const HaloSelect: React.FC<HaloSelectProps> = ({
           <motion.ul
             id="halo-select-listbox"
             className="absolute top-full left-0 right-0 mt-2 halo-glass-strong rounded-halo shadow-[var(--halo-shadow)] border border-[rgba(var(--halo-fg),0.1)] z-50 max-h-60 overflow-y-auto"
-            initial={{ opacity: 0, y: -10, filter: "blur(4px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
+            initial={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
             transition={{ duration: 0.15 }}
             role="listbox"
             aria-activedescendant={options[focusedIndex]?.value}
@@ -168,17 +167,17 @@ export const HaloSelect: React.FC<HaloSelectProps> = ({
                 key={option.value}
                 id={option.value}
                 className={cn(
-                  "w-full flex items-center justify-between px-4 py-2 text-sm text-left transition-colors cursor-pointer",
-                  "hover:bg-[rgba(var(--halo-primary),0.1)] focus:bg-[rgba(var(--halo-primary),0.1)]",
-                  focusedIndex === index && "bg-[rgba(var(--halo-primary),0.1)]",
-                  option.disabled && "opacity-50 cursor-not-allowed",
-                  index === 0 && "rounded-t-halo",
-                  index === options.length - 1 && "rounded-b-halo"
+                  'w-full flex items-center justify-between px-4 py-2 text-sm text-left transition-colors cursor-pointer',
+                  'hover:bg-[rgba(var(--halo-primary),0.1)] focus:bg-[rgba(var(--halo-primary),0.1)]',
+                  focusedIndex === index && 'bg-[rgba(var(--halo-primary),0.1)]',
+                  option.disabled && 'opacity-50 cursor-not-allowed',
+                  index === 0 && 'rounded-t-halo',
+                  index === options.length - 1 && 'rounded-b-halo',
                 )}
                 onClick={() => !option.disabled && handleSelect(option.value)}
-                aria-selected={option.value === props.value ? "true" : "false"}
+                aria-selected={option.value === props.value ? 'true' : 'false'}
                 role="option"
-                aria-disabled={option.disabled ? "true" : "false"}
+                aria-disabled={option.disabled ? 'true' : 'false'}
                 tabIndex={-1}
               >
                 <span className="text-[rgb(var(--halo-fg))]">{option.label}</span>
@@ -191,12 +190,7 @@ export const HaloSelect: React.FC<HaloSelectProps> = ({
         )}
       </AnimatePresence>
 
-      {isOpen && (
-        <div 
-          className="fixed inset-0 z-40" 
-          onClick={() => setIsOpen(false)}
-        />
-      )}
+      {isOpen && <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />}
     </div>
   );
 };

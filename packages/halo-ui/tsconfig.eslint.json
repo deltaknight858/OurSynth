@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/halo/*.ts",
+    "src/halo/*.tsx",
+    "src/halo/**/*.ts",
+    "src/halo/**/*.tsx"
+  ]
+}

@@ -1,0 +1,2 @@
+# Ignore type declaration files in halo for ESLint
+src/halo/**/*.d.ts
