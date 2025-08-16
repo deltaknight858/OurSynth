@@ -1,0 +1,23 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "moduleResolution": "bundler",
+    "plugins": [
+      { "name": "next" }
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@oursynth/halo-ui": ["../../packages/halo-ui/src"]
+    },
+    "target": "ES2017"
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "references": [
+    { "path": "../../packages/halo-ui" }
+  ]
+}

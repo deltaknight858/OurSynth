@@ -1,0 +1,9 @@
+{
+  "name": "@oursynth/shared-types",
+  "version": "1.0.0",
+  "types": "index.d.ts",
+  "license": "MIT",
+  "dependencies": {
+    "framer-motion": "^12.23.12"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Action",
+  "description": "Schema for a single action button configuration",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["id", "label", "icon", "run", "group"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Unique identifier for the action."
+      },
+      "label": {
+        "type": "string",
+        "description": "Human-readable label for the action button."
+      },
+      "icon": {
+        "type": "string",
+        "description": "Name of the Lucide icon component (e.g., 'LucideCamera', 'LucidePackage')."
+      },
+      "run": {
+        "type": "string",
+        "description": "Command to execute when the action is triggered (e.g., 'pnpm capture:emptystate:ps')."
+      },
+      "group": {
+        "type": "string",
+        "description": "Category or group for the action, used for UI clustering."
+      }
+    }
+  }
+}

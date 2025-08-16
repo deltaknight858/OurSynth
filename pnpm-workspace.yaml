@@ -1,0 +1,13 @@
+packages:
+  - apps/*
+  - packages/*
+  - infra/*
+
+onlyBuiltDependencies:
+  - '@tailwindcss/oxide'
+  - es5-ext
+  - esbuild
+  - framer
+  - sharp
+  - unrs-resolver
+  - vercel

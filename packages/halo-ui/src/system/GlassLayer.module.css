@@ -1,0 +1,17 @@
+.glass-layer {
+  @apply rounded-xl;
+  /* fallback for browsers without backdrop-filter */
+  background: rgba(255,255,255,0.8);
+  /* Tailwind can't do dynamic blur, so use a default and allow override */
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.08);
+}
+
+.glass-layer--no-border {
+  border: none;
+}
+
+.glass-layer--no-shadow {
+  box-shadow: none;
+}

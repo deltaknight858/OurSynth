@@ -1,0 +1,64 @@
+{
+  "name": "oursynth-eco",
+  "private": true,
+  "version": "1.0.0",
+  "packageManager": "pnpm@10.14.0",
+  "scripts": {
+    "bootstrap": "pnpm install && pnpm approve-builds --yes && pnpm -r --if-present build",
+    "dev": "pnpm -r --parallel --if-present dev",
+    "test": "pnpm -r --if-present test",
+    "registry:generate": "node scripts/generate-registry.mjs",
+    "health-check": "node scripts/health-check.mjs",
+    "clean-build": "node scripts/clean-build.mjs",
+    "refactor:gemini:oai:dry": "pwsh ./scripts/rename-gemini-to-oai.ps1 -DryRun",
+    "refactor:gemini:oai": "pwsh ./scripts/rename-gemini-to-oai.ps1",
+    "refactor:gemini:oai:strict": "pwsh ./scripts/rename-gemini-to-oai.ps1 -Strict",
+    "provenance:capture": "node scripts/capture-provenance.mjs",
+    "validate:actions": "node scripts/validate-actions-schema.mjs",
+    "generate:actions-types": "node scripts/generate-actions-types.mjs",
+    "refactor:deploy:connect:dry": "pwsh ./scripts/rename-deploy-to-connect.ps1 -DryRun",
+    "refactor:deploy:connect": "pwsh ./scripts/rename-deploy-to-connect.ps1",
+    "refactor:deploy:connect:strict": "pwsh ./scripts/rename-deploy-to-connect.ps1 -Strict",
+    "mesh-sim:preview": "pwsh ./scripts/mesh-sim-provenance-and-preview.ps1",
+    "lint": "eslint . --ext ts,tsx,js,jsx --cache",
+    "lint:fix": "eslint . --ext ts,tsx,js,jsx --cache --fix",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write ."
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@playwright/test": "^1.54.2",
+    "@types/node": "^20.19.10",
+    "@types/react": "^19.1.10",
+    "@typescript-eslint/eslint-plugin": "^8.39.1",
+    "@typescript-eslint/parser": "^8.39.1",
+    "@vitest/ui": "^3.2.4",
+    "ajv": "^8.12.0",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.3",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-react": "^7.34.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "json-schema-to-typescript": "^13.1.1",
+    "lint-staged": "^13.2.3",
+    "prettier": "^3.2.5",
+    "vitest": "^3.2.4"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,scss,md}": [
+      "prettier --write"
+    ]
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "framer-motion": "10.x",
+    "next": "^15.4.6",
+    "zod": "^3.25.76"
+  }
+}

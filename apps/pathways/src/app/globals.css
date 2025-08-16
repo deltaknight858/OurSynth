@@ -1,0 +1,234 @@
+@import "tailwindcss";
+
+/* ===== Electric Purple Theme - Deep Dark, Sharp, Electrical, Futuristic ===== */
+
+:root {
+  /* Electric Purple Base Colors */
+  --background: #0a0a0f;        /* Deep dark base */
+  --foreground: #ffffff;        /* Sharp white text */
+  --electric-purple: #a020f0;   /* Main electric purple */
+  --electric-light: #d946ef;    /* Bright electric purple */
+  --electric-dark: #7c1fa8;     /* Deep purple */
+  --electric-glow: #e879f9;     /* Purple glow */
+  
+  /* Glass Morphism */
+  --glass-bg: rgba(160, 32, 240, 0.08);
+  --glass-border: rgba(160, 32, 240, 0.2);
+  --glass-blur: blur(20px) saturate(180%);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ===== Electric Energy Background ===== */
+.gradient-bg {
+  background: linear-gradient(135deg, 
+    #0a0a0f 0%,           /* Deep dark base */
+    #1a0b2e 25%,          /* Dark purple shadow */
+    #16213e 50%,          /* Deep blue-purple */
+    #0f0c29 75%,          /* Midnight purple */
+    #0a0a0f 100%          /* Back to dark base */
+  );
+  background-size: 400% 400%;
+  animation: electricFlow 12s ease-in-out infinite;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animated electric energy flow */
+@keyframes electricFlow {
+  0% { background-position: 0% 50%; }
+  25% { background-position: 100% 25%; }
+  50% { background-position: 100% 75%; }
+  75% { background-position: 0% 100%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Electric energy overlay */
+.gradient-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(160, 32, 240, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(217, 70, 239, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(160, 32, 240, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== Sharp Glass Morphism Components ===== */
+.glass-card {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 16px !important;
+  box-shadow: 
+    0 8px 32px rgba(160, 32, 240, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Electric shimmer effect */
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(160, 32, 240, 0.15),
+    transparent
+  );
+  transition: left 0.8s ease;
+  z-index: 1;
+}
+
+.glass-card:hover::before {
+  left: 100%;
+}
+
+/* ===== Electric Button Styles ===== */
+.electric-button {
+  background: linear-gradient(135deg, var(--electric-purple) 0%, var(--electric-light) 100%) !important;
+  border: none !important;
+  border-radius: 12px !important;
+  color: white !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  box-shadow: 
+    0 4px 15px rgba(160, 32, 240, 0.4),
+    0 0 20px rgba(160, 32, 240, 0.2) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.electric-button:hover {
+  background: linear-gradient(135deg, var(--electric-light) 0%, var(--electric-purple) 100%) !important;
+  box-shadow: 
+    0 6px 20px rgba(160, 32, 240, 0.6),
+    0 0 30px rgba(160, 32, 240, 0.4) !important;
+  transform: translateY(-2px) scale(1.02) !important;
+}
+
+/* Electric button shine effect */
+.electric-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s ease;
+}
+
+.electric-button:hover::before {
+  left: 100%;
+}
+
+/* ===== Electric Text Effects ===== */
+.electric-text {
+  background: linear-gradient(135deg, 
+    #ffffff 0%, 
+    #e879f9 25%, 
+    #a020f0 50%, 
+    #d946ef 75%, 
+    #ffffff 100%
+  ) !important;
+  background-clip: text !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-size: 200% 200%;
+  animation: electricTextFlow 3s ease-in-out infinite;
+}
+
+@keyframes electricTextFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ===== Sharp Input Fields ===== */
+.electric-input .MuiOutlinedInput-root {
+  background: rgba(160, 32, 240, 0.05) !important;
+  border-radius: 12px !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.electric-input .MuiOutlinedInput-root fieldset {
+  border-color: rgba(160, 32, 240, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.electric-input .MuiOutlinedInput-root:hover fieldset {
+  border-color: rgba(160, 32, 240, 0.5) !important;
+  box-shadow: 0 0 10px rgba(160, 32, 240, 0.2) !important;
+}
+
+.electric-input .MuiOutlinedInput-root.Mui-focused fieldset {
+  border-color: var(--electric-purple) !important;
+  border-width: 2px !important;
+  box-shadow: 
+    0 0 0 3px rgba(160, 32, 240, 0.2),
+    0 0 20px rgba(160, 32, 240, 0.3) !important;
+}
+
+.electric-input .MuiInputBase-input {
+  color: white !important;
+}
+
+.electric-input .MuiInputBase-input::placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* ===== Electric Loading Animation ===== */
+.electric-loading {
+  background: conic-gradient(from 0deg, var(--electric-purple), var(--electric-light), var(--electric-glow), var(--electric-purple));
+  animation: electricSpin 2s linear infinite;
+  border-radius: 50%;
+}
+
+@keyframes electricSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== Sexy Scrollbar ===== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(160, 32, 240, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--electric-purple), var(--electric-light));
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, var(--electric-light), var(--electric-glow));
+  box-shadow: 0 0 10px rgba(160, 32, 240, 0.5);
+}

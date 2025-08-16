@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* OurSynth Deploy – Frosty Deployment with Purple & Green Neon */
+    --background: 210 40% 98%;  /* Light frosty background */
+    --foreground: 222 84% 5%;   /* Dark text for readability */
+    --card: 0 0% 100%;          /* Pure white cards */
+    --card-foreground: 222 84% 5%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 84% 5%;
+    --primary: 288 85% 54%;     /* Electric purple (preserved) */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 159 70% 40%;   /* Deployment green (preserved) */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 215 25% 95%;       /* Light muted backgrounds */
+    --muted-foreground: 215 25% 25%; /* Dark muted text */
+    --accent: 288 85% 54%;      /* Purple accent */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 288 40% 80%;      /* Light purple borders */
+    --input: 0 0% 100%;         /* White inputs */
+    --ring: 288 85% 54%;        /* Purple focus rings */
+    --chart-1: 288 85% 54%;     /* Electric purple */
+    --chart-2: 159 70% 40%;     /* Deployment green */
+    --chart-3: 288 60% 70%;     /* Light purple */
+    --chart-4: 159 50% 60%;     /* Light green */
+    --chart-5: 270 80% 60%;     /* Purple variant */
+    --radius: 0.75rem;
+
+    /* Magical Neon variables for Deploy */
+    --electric-purple: #a020f0;
+    --electric-light:  #d946ef;
+    --electric-dark:   #7c1fa8;
+    --deployment-green: #10b981;
+    --deployment-light: #34d399;
+    --deployment-dark:  #059669;
+    --neon-cyan: #00ffcc;
+  }
+
+  .dark {
+    /* Mirror light‐mode values for consistency */
+    --background: 210 40% 98%;
+    /* …and so on (same as above) */
+  }
+
+  /* Global resets */
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Deploy animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 15% 85%, rgba(160,32,240,0.12) 0%, transparent 60%),
+      radial-gradient(circle at 85% 15%, rgba(16,185,129,0.08) 0%, transparent 60%),
+      radial-gradient(circle at 50% 50%, rgba(217,70,239,0.06) 0%, transparent 70%);
+    z-index: -2;
+    animation: deployment-pulse 18s ease-in-out infinite;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      linear-gradient(90deg, transparent 0%, rgba(16,185,129,0.03) 50%, transparent 100%),
+      linear-gradient(180deg, transparent 0%, rgba(160,32,240,0.04) 50%, transparent 100%);
+    z-index: -1;
+    animation: deployment-flow 25s linear infinite;
+  }
+
+  @keyframes deployment-pulse {
+    0%, 100% {
+      transform: scale(1) rotate(0deg);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.05) rotate(0.5deg);
+      opacity: 0.8;
+    }
+  }
+
+  @keyframes deployment-flow {
+    0%   { transform: translateY(-100%); }
+    100% { transform: translateY(100%);   }
+  }
+}
+
+@layer components {
+  .container {
+    @apply mx-auto px-4 md:px-6 lg:px-8 max-w-7xl w-full;
+  }
+
+  .glass-card {
+    @apply bg-purple-950/30 backdrop-blur-md border border-purple-500/20 shadow-2xl shadow-purple-500/25;
+    background: rgba(160,32,240,0.08);
+    border:     1px solid rgba(160,32,240,0.2);
+    box-shadow: 0 8px 32px rgba(160,32,240,0.25);
+    position:   relative;
+    border-radius: var(--radius);
+  }
+
+  .glass-card::before {
+    content: '';
+    @apply absolute inset-0 rounded-lg pointer-events-none;
+    background: linear-gradient(135deg, rgba(160,32,240,0.1) 0%, transparent 50%);
+  }
+
+  /* Neon border helper */
+  .neon-border {
+    @apply border-2 border-electric-purple shadow-lg shadow-electric-purple/50;
+  }
+
+  /* …add any other component styles here… */
+}

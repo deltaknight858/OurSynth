@@ -1,0 +1,12 @@
+.halo-slider-thumb {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 9999px;
+  background: rgb(var(--halo-primary));
+  pointer-events: none;
+  transition: left 0.2s cubic-bezier(var(--halo-ease));
+  left: var(--halo-slider-thumb-left, 0);
+}

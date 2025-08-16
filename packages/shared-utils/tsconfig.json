@@ -1,0 +1,11 @@
+// Minimal TypeScript config for shared-utils
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "dist"
+  },
+  "include": ["index.ts", "index.js", "index.d.ts"]
+}

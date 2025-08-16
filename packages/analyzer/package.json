@@ -1,0 +1,12 @@
+{
+  "name": "@oursynth/analyzer",
+  "version": "0.1.0",
+  "main": "index.ts",
+  "types": "index.ts",
+  "license": "MIT",
+  "dependencies": {
+    "@babel/parser": "^7.24.0",
+    "@babel/traverse": "^7.24.0",
+    "framer-motion": "^12.23.12"
+  }
+}

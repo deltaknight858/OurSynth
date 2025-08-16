@@ -1,0 +1,27 @@
+{
+  "name": "pushable-agent-action",
+  "version": "1.0.0",
+  "description": "A project to enable pushable agent actions from the command center.",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "typescript": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/pushable-agent-action.git"
+  },
+  "keywords": [
+    "agent",
+    "command center",
+    "pushable actions"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

@@ -1,0 +1,10 @@
+{
+  "name": "@oursynth/shared-config",
+  "version": "1.0.0",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "license": "MIT",
+  "dependencies": {
+    "framer-motion": "^12.23.12"
+  }
+}
